@@ -1,12 +1,9 @@
-import React from 'react'
+// App.tsx
+import React from 'react';
+import AppRoutes from './app/routes/AppRoutes';
 
-function App() {
- 
-  return (
-    <>
-     
-    </>
-  )
-}
+const App: React.FC = () => {
+  return <AppRoutes />;
+};
 
-export default App
+export default App;
