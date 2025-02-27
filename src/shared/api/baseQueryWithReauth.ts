@@ -6,7 +6,6 @@ const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
   baseUrl: 'https://iapitest.eva.guru/',
-  credentials: 'include',
   prepareHeaders: (headers) => {
     const token = localStorage.getItem('access_token');
     if (token) {
