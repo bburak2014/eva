@@ -1,7 +1,6 @@
 // src/features/auth/api/authApi.ts
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
-
 export interface LoginRequest {
   email: string;
   password: string;
@@ -10,7 +9,6 @@ export interface LoginRequest {
 export interface LoginResponse {
   Data: {
     AccessToken: string;
-    RefreshToken: string;
     TokenType: string;
     ExpiresAt: string;
   };

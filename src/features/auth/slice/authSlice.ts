@@ -4,13 +4,11 @@ import { authApi } from '@/features/auth/api/authApi';
 
 interface AuthState {
   accessToken: string | null;
-  refreshToken: string | null;
   expiresAt: string | null;
 }
 
 const initialState: AuthState = {
   accessToken: null,
-  refreshToken: null,
   expiresAt: null,
 };
 
@@ -20,10 +18,8 @@ const authSlice = createSlice({
   reducers: {
     logout(state) {
       state.accessToken = null;
-      state.refreshToken = null;
       state.expiresAt = null;
       localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
       localStorage.removeItem('expires_at');
     },
   },
@@ -32,10 +28,8 @@ const authSlice = createSlice({
       authApi.endpoints.login.matchFulfilled,
       (state, { payload }) => {
         state.accessToken = payload.Data.AccessToken;
-        state.refreshToken = payload.Data.RefreshToken;
         state.expiresAt = payload.Data.ExpiresAt;
         localStorage.setItem('access_token', payload.Data.AccessToken);
-        localStorage.setItem('refresh_token', payload.Data.RefreshToken);
         localStorage.setItem('expires_at', payload.Data.ExpiresAt);
       }
     );
