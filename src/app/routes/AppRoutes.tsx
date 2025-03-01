@@ -1,6 +1,9 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import NotFound from '@/shared/components/NotFound';
+import NotFound from '@/shared/components/common/error/NotFound';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorFalBackComponent from '@/shared/components/common/error/ErrorFalBack';
+import LoadingSpinner from '@/shared/components/common/loading/Loading';
 
 type ModuleRoute = {
   Component: React.FC;
@@ -24,15 +27,18 @@ const AppRoutes: React.FC = () => {
   );
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Routes>
-        {matchedModules.map(({ Component }, idx) => (
-          <Route key={idx} path="/*" element={<Component />} />
-        ))}
-        <Route path="*" element={<NotFound />} />
-
-      </Routes>
-    </Suspense>
+    <ErrorBoundary
+      FallbackComponent={ErrorFalBackComponent}
+      onReset={() => { }}>
+      <Suspense fallback={<LoadingSpinner fullScreen />}>
+        <Routes>
+          {matchedModules.map(({ Component }, idx) => (
+            <Route key={idx} path="/*" element={<Component />} />
+          ))}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 
