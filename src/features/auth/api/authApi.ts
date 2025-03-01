@@ -16,6 +16,11 @@ export interface LoginResponse {
 
   };
 }
+interface UserInformationResponse {
+  storeId: string;
+  marketplaceName: string;
+  // diğer kullanıcı bilgileri...
+}
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -36,7 +41,13 @@ export const authApi = createApi({
         },
       }),
     }),
+    getUserInformation: builder.query<UserInformationResponse, void>({
+      query: () => ({
+        url: '/user/user-information',
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation ,useGetUserInformationQuery} = authApi;

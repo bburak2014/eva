@@ -34,7 +34,7 @@ folders.forEach(folder => {
 
 export const ${moduleName}Api = createApi({
   reducerPath: '${moduleName}Api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://your-api-base-url.com' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_URL}),
   endpoints: (builder) => ({
     // Define endpoints here
   }),
@@ -56,6 +56,7 @@ import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from '../../../shared/components/ProtectedRoute';
 import ${capitalizedModuleName}Page from '../pages/${capitalizedModuleName}Page';
 
+
 const ${capitalizedModuleName}Routes: React.FC = () => (
   <Routes>
     <Route element={<ProtectedRoute />}>
@@ -63,6 +64,7 @@ const ${capitalizedModuleName}Routes: React.FC = () => (
     </Route>
   </Routes>
 );
+export const basePath = "/${moduleName}";
 
 export default ${capitalizedModuleName}Routes;
 `;

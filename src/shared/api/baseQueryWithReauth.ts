@@ -27,8 +27,7 @@ export const baseQueryWithReauth = async (args: any, api: any, extraOptions: any
       localStorageManager.remove('access_token');
       localStorageManager.remove('expires_at');
       return { error: { status: 401, data: { message: 'Token expired' } } };
-
-    }toastManager
+    }
   }
 
   let result = await baseQuery(args, api, extraOptions);
