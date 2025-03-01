@@ -1,14 +1,15 @@
 // src/shared/api/baseQueryWithReauth.ts
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
-import { showToast } from '@/shared/utils/toast';
+import { toastManager } from '@/shared/utils/toastManager';
+import localStorageManager from '@/shared/utils/localStorageManager';
 
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL,
   prepareHeaders: (headers) => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorageManager.get('access_token');
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
@@ -17,13 +18,14 @@ const baseQuery = fetchBaseQuery({
 });
 
 export const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
-  const tokenExpiry = localStorage.getItem('expires_at');
+  const tokenExpiry = localStorageManager.get('expires_at');
   if (tokenExpiry) {
-    const expiresAt = new Date(tokenExpiry);
+    const expiresAt = new Date(String(tokenExpiry));
 
     if (new Date() >= expiresAt) {
-      showToast('Oturumun Süresi Doldu!', 2000, 'error');
-      localStorage.clear()
+      toastManager.showToast('Oturumun Süresi Doldu!', 'error', 2000);
+      localStorageManager.remove('access_token');
+      localStorageManager.remove('expires_at');
       return { error: { status: 401, data: { message: 'Token expired' } } };
 
     }
@@ -36,9 +38,9 @@ export const baseQueryWithReauth = async (args: any, api: any, extraOptions: any
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
       try {
-        showToast('Yetki Hatası!', 2000, 'error');
-        localStorage.clear()
-
+        toastManager.showToast('Yetki Hatası!', 'error', 2000);
+        localStorageManager.remove('access_token');
+        localStorageManager.remove('expires_at');
         return result;
       } finally {
         release();

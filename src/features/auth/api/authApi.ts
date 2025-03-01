@@ -7,10 +7,13 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  ApiStatus: boolean | any;
+  ApiStatusCode: number | any;
   Data: {
     AccessToken: string;
     TokenType: string;
     ExpiresAt: string;
+
   };
 }
 
