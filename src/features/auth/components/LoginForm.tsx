@@ -18,8 +18,8 @@ const LoginForm: React.FC = () => {
   const validationSchema = Yup.object({
     email: Yup.string()
       .email('Geçerli bir email girin')
-      .required('Email zorunludur'),
-    password: Yup.string().required('Şifre zorunludur'),
+      .required('Email required'),
+    password: Yup.string().required('Password required'),
   });
 
   const initialValues: LoginValues = {
@@ -34,70 +34,75 @@ const LoginForm: React.FC = () => {
     try {
       const result = await login(values).unwrap();
       if (result.ApiStatus && result.ApiStatusCode === 200) {
-        toastManager.showToast('Giriş Başarılı!', 'success', 3000);
+        toastManager.showToast('Login successful!', 'success', 3000);
       } else {
-        toastManager.showToast('Giriş Başarısız!', 'error', 3000);
+        toastManager.showToast('Login failed!', 'error', 3000);
       }
     } catch (err) {
-      toastManager.showToast('Giriş Başarısız!', 'error', 3000);
+      toastManager.showToast('Login failed!', 'error', 3000);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-
-      {/* left Column */}
-      <div className="hidden lg:flex w-full h-full  lg:w-[58%] flex-col p-10 gap-10 bg-background">
-
-        <div className="mb-10">
-          <h2 className="text-2xl font-bold text-slate-800">Birdoo Logo</h2>
-        </div>
-
-        <div className="flex items-center flex-col gap-16">
-
-          <img
-            src="/images/Frame.png"
-            alt="Frame"
-            className="w-[300px] h-[300px] object-contain"
+    <div className="min-h-screen flex">
+      {/* Left Column */}
+      <div className="bg-[#f5f3fb8f] hidden lg:flex justify-center w-full lg:w-[58%] flex-col p-10 gap-10 bg-background">
+        <div>
+        <img 
+            src="images/logo.png"
+            alt="Logo"
+            height={60}
+            width={60}
+            className='absolute top-10 left-10'
           />
-
+        </div>
+        <div className="flex flex-col items-center gap-16">
+          <img
+            src="images/frame.png"
+            alt="Frame"
+            className="hidden xl:block w-2/3 h-2/3 object-contain"
+          />
           <div className="flex flex-col gap-6">
             <p className="font-bold text-[2rem] leading-primary text-slate-800">
-              Let Free Your Creativity with Our Intuitive Content Creator
+            Elevate Your Online Business with Intelligent Innovation
             </p>
             <p className="font-base text-base leading-secondary text-secondary">
-              No design degree is required! Effortlessly craft and design
-              stunning and captivating content using our user-friendly
-              creative editor. With our drag-and-drop technology, anyone can
-              create amazing marketing materials in.
+            Harness the power of advanced AI and Amazon-powered insights to transform your online store into a dynamic hub of growth and efficiency. Experience seamless integration, real-time analytics, and personalized strategies that drive remarkable results. Step into a world where cutting-edge technology meets commerce, optimizing every decision for success.
+
             </p>
           </div>
         </div>
       </div>
 
       {/* Right Column */}
-      <div className="flex w-full h-full min-h-screen lg:w-[42%] p-10 justify-center bg-white">
-        <div className="w-full gap-8 flex flex-col max-w-lg relative items-center justify-center">
+      <div className="flex w-full lg:w-[42%] p-10 justify-center bg-white">
+        <div className="w-full max-w-lg flex flex-col items-center justify-center gap-8 relative">
+        <img 
+            src="images/logo.png"
+            alt="Logo"
+            height={60}
+            width={60}
+            className='block lg:hidden'
+          />
           <div className="flex flex-col items-center px-4 gap-4">
             <p className="font-bold text-[2rem] leading-9 text-black text-center">
               Welcome Eva!
             </p>
             <p className="font-base text-sm leading-5 text-slate-400 text-center">
-              Manage your e-commerce with ai, watch your company grow.
+              Manage your e-commerce with AI, watch your company grow.
             </p>
           </div>
-
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
             {({ isSubmitting }) => (
-              <Form className="flex flex-col gap-4 mt-4 w-full">
-                {/* Email */}
-                <div className="flex flex-col gap-2 mb-2">
+              <Form className="w-full flex flex-col gap-4 mt-4">
+                {/* Email Field */}
+                <div className="flex flex-col gap-2">
                   <label
                     htmlFor="email"
                     className="text-sm font-medium text-slate-800 leading-5"
@@ -108,7 +113,7 @@ const LoginForm: React.FC = () => {
                     type="email"
                     name="email"
                     placeholder="Enter your e-mail address"
-                    className="w-full px-4 py-3 border rounded-lg bg-slate-100 focus:outline-none focus:border-green"
+                    className="w-full px-4 py-3 border rounded-lg bg-slate-100 focus:outline-none focus:border-purple-500 transition"
                   />
                   <ErrorMessage
                     name="email"
@@ -117,8 +122,8 @@ const LoginForm: React.FC = () => {
                   />
                 </div>
 
-                {/* Password */}
-                <div className="flex flex-col gap-2 mb-3">
+                {/* Password Field */}
+                <div className="flex flex-col gap-2">
                   <label
                     htmlFor="password"
                     className="text-sm font-medium text-slate-800 leading-5"
@@ -129,7 +134,7 @@ const LoginForm: React.FC = () => {
                     type="password"
                     name="password"
                     placeholder="Enter your password"
-                    className="w-full px-4 py-3 border rounded-lg bg-slate-100 focus:outline-none focus:border-green"
+                    className="w-full px-4 py-3 border rounded-lg bg-slate-100 focus:outline-none focus:border-purple-500 transition"
                   />
                   <ErrorMessage
                     name="password"
@@ -142,7 +147,7 @@ const LoginForm: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full p-3 bg-green-600 text-sm text-white rounded-lg font-medium text-center flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full p-3 bg-purple-500 text-sm text-white rounded-lg font-medium text-center flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isSubmitting && (
                     <InlineLoading

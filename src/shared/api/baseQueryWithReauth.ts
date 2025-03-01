@@ -23,12 +23,12 @@ export const baseQueryWithReauth = async (args: any, api: any, extraOptions: any
     const expiresAt = new Date(String(tokenExpiry));
 
     if (new Date() >= expiresAt) {
-      toastManager.showToast('Oturumun Süresi Doldu!', 'error', 2000);
+      toastManager.showToast('Session Expired!', 'error', 2000);
       localStorageManager.remove('access_token');
       localStorageManager.remove('expires_at');
       return { error: { status: 401, data: { message: 'Token expired' } } };
 
-    }
+    }toastManager
   }
 
   let result = await baseQuery(args, api, extraOptions);
@@ -38,7 +38,7 @@ export const baseQueryWithReauth = async (args: any, api: any, extraOptions: any
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
       try {
-        toastManager.showToast('Yetki Hatası!', 'error', 2000);
+        toastManager.showToast('Authorization Failed!', 'error', 2000);
         localStorageManager.remove('access_token');
         localStorageManager.remove('expires_at');
         return result;

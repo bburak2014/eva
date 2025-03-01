@@ -41,7 +41,6 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
-  // Global toastManager'a abone olunuyor.
   useEffect(() => {
     const listener = (toast: ToastData) => {
       addToast(toast.message, toast.type, toast.duration);
