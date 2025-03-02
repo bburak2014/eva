@@ -7,8 +7,8 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  ApiStatus: boolean | any;
-  ApiStatusCode: number | any;
+  ApiStatus: boolean;
+  ApiStatusCode: number;
   Data: {
     AccessToken: string;
     TokenType: string;

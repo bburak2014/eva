@@ -63,7 +63,7 @@ export const dashboardApi = createApi({
       query: (params) => ({
         url: 'data/daily-sales-overview',
         method: 'POST',
-        data: params
+        body: params
       })
     }),
     // Endpoint: get daily sales SKU list for table (single day or comparison)
@@ -71,7 +71,7 @@ export const dashboardApi = createApi({
       query: (params) => ({
         url: 'data/daily-sales-sku-list',
         method: 'POST',
-        data: params
+        body: params
       })
     }),
     // Endpoint: get refund rates for a list of SKUs
@@ -79,7 +79,7 @@ export const dashboardApi = createApi({
       query: (params) => ({
         url: 'data/get-sku-refund-rate',
         method: 'POST',
-        data: params
+        body: params
       })
     })
   })

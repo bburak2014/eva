@@ -9,8 +9,8 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-    accessToken: null,
-    expiresAt: null,
+    accessToken: localStorageManager.get('access_token') || null,
+    expiresAt: localStorageManager.get('expires_at') || null,
 };
 
 const authSlice = createSlice({

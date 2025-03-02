@@ -1,27 +1,30 @@
 // features/dashboard/components/SalesTable.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '@/app/store';
 import { setCurrentPage } from '../slice/dashboardSlice';
-import { 
-  useLazyGetDailySalesSkuListQuery, 
-  useLazyGetSkuRefundRateQuery, 
-  SkuDataItem, 
-  SkuRefundRateItem 
+import {
+  useLazyGetDailySalesSkuListQuery,
+  useLazyGetSkuRefundRateQuery,
+  SkuDataItem,
+  SkuRefundRateItem
 } from '../api/dashboardApi';
-import { useGetUserInformationQuery } from '@/features/auth/api/authApi';
+import LoadingSpinner from '@/shared/components/common/loading/Loading';
 
-const SalesTable: React.FC = () => {
+interface UserData {
+  sellerId: string;
+  marketplace: string;
+
+}
+const SalesTable: React.FC<UserData> = (props) => {
+  const { sellerId, marketplace } = props || null;
   const dispatch = useDispatch<AppDispatch>();
   const { selectedDates, currentPage } = useSelector((state: RootState) => state.dashboard);
   const [skuData, setSkuData] = useState<SkuDataItem[]>([]);
   const [lastPageFetched, setLastPageFetched] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  // Auth bilgilerini API'den alıyoruz
-  const { data: userInfo } = useGetUserInformationQuery();
-  const marketplace = userInfo?.marketplaceName || '';
-  const sellerId = userInfo?.storeId || '';
+
 
   const [triggerSkuList, skuListResult] = useLazyGetDailySalesSkuListQuery();
   const [triggerRefund, refundResult] = useLazyGetSkuRefundRateQuery();
@@ -126,18 +129,19 @@ const SalesTable: React.FC = () => {
     ? ['SKU', `${selectedDates[0]} Sales`, `${selectedDates[1]} Sales`, 'Diff', 'Refund Rate']
     : ['SKU', 'Sales', 'Refund Rate'];
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage > currentPage && skuData && skuData.length < 30) return;
+  const handlePageChange = useCallback((newPage: number) => {
     dispatch(setCurrentPage(newPage));
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  };
+  }, [dispatch]);
 
   return (
     <div className="bg-white p-4 rounded shadow">
       {loading ? (
-        <p className="text-gray-500">Loading data...</p>
+        <div className="flex justify-center py-4">
+          <LoadingSpinner />
+        </div>
       ) : isError ? (
-        <p className="text-red-500">Error loading table data.</p>
+        <div className="text-red-500 text-center">Error loading table data. Please try again.</div>
       ) : skuData.length === 0 ? (
         <p className="text-gray-500">No data available.</p>
       ) : (
@@ -174,7 +178,7 @@ const SalesTable: React.FC = () => {
       )}
       {skuData.length > 0 && (
         <div className="flex justify-end items-center mt-2 space-x-2">
-          <button 
+          <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
@@ -182,9 +186,10 @@ const SalesTable: React.FC = () => {
             Previous
           </button>
           <span>Page {currentPage}</span>
-          <button 
+          <button
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={!skuData || (currentPage * 10 >= skuData.length && skuData.length < 30)}
+            disabled={currentPage >= Math.ceil(skuData.length / 10) && !hasMore}
+
             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
           >
             Next

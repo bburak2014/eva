@@ -6,7 +6,7 @@ import DashboardPage from '../pages/DashboardPage';
 
 const DashboardRoutes: React.FC = () => (
   <Routes>
-    <Route>
+    <Route element={<ProtectedRoute />}>
       <Route path="/dashboard" element={<DashboardPage />} />
     </Route>
   </Routes>
