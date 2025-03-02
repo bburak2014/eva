@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { useLoginMutation } from '@/features/auth/api/authApi';
 import { toastManager } from '@/shared/utils/toastManager';
 import InlineLoading from '@/shared/components/common/loading/InlineLoading';
+import { useNavigate } from 'react-router-dom';
 
 
 interface LoginValues {
@@ -13,11 +14,12 @@ interface LoginValues {
 
 const LoginForm: React.FC = () => {
   const [login] = useLoginMutation();
+  const navigate = useNavigate();
 
   // Yup validasyon şeması
   const validationSchema = Yup.object({
     email: Yup.string()
-      .email('Geçerli bir email girin')
+      .email('Invalid email')
       .required('Email required'),
     password: Yup.string().required('Password required'),
   });
@@ -34,7 +36,10 @@ const LoginForm: React.FC = () => {
     try {
       const result = await login(values).unwrap();
       if (result.ApiStatus && result.ApiStatusCode === 200) {
+
         toastManager.showToast('Login successful!', 'success', 3000);
+        navigate('/dashboard');
+
       } else {
         toastManager.showToast('Login failed!', 'error', 3000);
       }
@@ -50,9 +55,9 @@ const LoginForm: React.FC = () => {
       {/* Left Column */}
       <div className="bg-[#f5f3fb8f] hidden lg:flex justify-center w-full lg:w-[58%] flex-col p-10 gap-10 bg-background">
         <div>
-        <img 
+          <img
             src="images/logo.png"
-            alt="Logo"
+            alt="eva-logo"
             height={60}
             width={60}
             className='absolute top-10 left-10'
@@ -61,15 +66,15 @@ const LoginForm: React.FC = () => {
         <div className="flex flex-col items-center gap-16">
           <img
             src="images/frame.png"
-            alt="Frame"
-            className="hidden xl:block w-2/3 h-2/3 object-contain"
+            alt="eva-frame"
+            className="hidden xl:block w-1/2 h-1/2 2xl:w-2/3 2xl:h-2/3 object-contain"
           />
           <div className="flex flex-col gap-6">
             <p className="font-bold text-[2rem] leading-primary text-slate-800">
-            Elevate Your Online Business with Intelligent Innovation
+              Elevate Your Online Business with Intelligent Innovation
             </p>
             <p className="font-base text-base leading-secondary text-secondary">
-            Harness the power of advanced AI and Amazon-powered insights to transform your online store into a dynamic hub of growth and efficiency. Experience seamless integration, real-time analytics, and personalized strategies that drive remarkable results. Step into a world where cutting-edge technology meets commerce, optimizing every decision for success.
+              Harness the power of advanced AI and Amazon-powered insights to transform your online store into a dynamic hub of growth and efficiency. Experience seamless integration, real-time analytics, and personalized strategies that drive remarkable results. Step into a world where cutting-edge technology meets commerce, optimizing every decision for success.
 
             </p>
           </div>
@@ -78,8 +83,8 @@ const LoginForm: React.FC = () => {
 
       {/* Right Column */}
       <div className="flex w-full lg:w-[42%] p-10 justify-center bg-white">
-        <div className="w-full max-w-lg flex flex-col items-center justify-center gap-8 relative">
-        <img 
+        <div className="w-full max-w-lg flex flex-col items-center justify-center gap-8">
+          <img
             src="images/logo.png"
             alt="Logo"
             height={60}
@@ -114,6 +119,8 @@ const LoginForm: React.FC = () => {
                     name="email"
                     placeholder="Enter your e-mail address"
                     className="w-full px-4 py-3 border rounded-lg bg-slate-100 focus:outline-none focus:border-purple-500 transition"
+                    autoComplete="email"
+                    aria-label="Email Address"
                   />
                   <ErrorMessage
                     name="email"
@@ -135,6 +142,9 @@ const LoginForm: React.FC = () => {
                     name="password"
                     placeholder="Enter your password"
                     className="w-full px-4 py-3 border rounded-lg bg-slate-100 focus:outline-none focus:border-purple-500 transition"
+                    autoComplete="current-password"
+                    aria-label="Password"
+
                   />
                   <ErrorMessage
                     name="password"

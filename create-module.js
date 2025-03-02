@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
 
-// Capitalize first letter
+// İlk harfi büyük yapma fonksiyonu
 function capitalize(str) {
   return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 }
@@ -17,24 +17,39 @@ if (!moduleName) {
 
 const capitalizedModuleName = capitalize(moduleName);
 const moduleBasePath = path.join(process.cwd(), 'src', 'features', moduleName);
-const folders = ['api', 'components', 'slice', 'pages', 'routes'];
+
+// Yardımcı fonksiyonlar
+function createFolder(folderPath) {
+  try {
+    fs.mkdirSync(folderPath, { recursive: true });
+    console.log(`Created folder: ${folderPath}`);
+  } catch (error) {
+    console.error(`Error creating folder ${folderPath}:`, error);
+  }
+}
+
+function createFile(folderPath, fileName, content) {
+  const filePath = path.join(folderPath, fileName);
+  try {
+    fs.writeFileSync(filePath, content);
+    console.log(`Created file: ${filePath}`);
+  } catch (error) {
+    console.error(`Error creating file ${filePath}:`, error);
+  }
+}
 
 console.log(`Creating module '${moduleName}' in src/features/...`);
 console.log(isProtected ? 'Protected route enabled.' : 'Normal route.');
 
-folders.forEach(folder => {
-  const folderPath = path.join(moduleBasePath, folder);
-  fs.mkdirSync(folderPath, { recursive: true });
-  console.log(`Created folder: ${folderPath}`);
-
-  if (folder === 'api') {
+// Her klasöre ait dosya bilgilerini içeren nesne
+const folderFileGenerators = {
+  api: () => {
     const fileName = `${moduleName}Api.ts`;
-    const filePath = path.join(folderPath, fileName);
     const content = `import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const ${moduleName}Api = createApi({
   reducerPath: '${moduleName}Api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://your-api-base-url.com' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_URL }),
   endpoints: (builder) => ({
     // Define endpoints here
   }),
@@ -42,13 +57,10 @@ export const ${moduleName}Api = createApi({
 
 export const { /* hooks */ } = ${moduleName}Api;
 `;
-    fs.writeFileSync(filePath, content);
-    console.log(`Created file: ${filePath}`);
-  }
-  else if (folder === 'routes') {
+    return { fileName, content };
+  },
+  routes: () => {
     const fileName = `Routes.tsx`;
-    const filePath = path.join(folderPath, fileName);
-
     let content;
     if (isProtected) {
       content = `import React from 'react';
@@ -64,6 +76,7 @@ const ${capitalizedModuleName}Routes: React.FC = () => (
   </Routes>
 );
 
+export const basePath = "/${moduleName}";
 export default ${capitalizedModuleName}Routes;
 `;
     } else {
@@ -77,16 +90,14 @@ const ${capitalizedModuleName}Routes: React.FC = () => (
   </Routes>
 );
 
+export const basePath = "/${moduleName}";
 export default ${capitalizedModuleName}Routes;
 `;
     }
-
-    fs.writeFileSync(filePath, content);
-    console.log(`Created file: ${filePath}`);
-  }
-  else if (folder === 'pages') {
+    return { fileName, content };
+  },
+  pages: () => {
     const fileName = `${capitalizedModuleName}Page.tsx`;
-    const filePath = path.join(folderPath, fileName);
     const content = `import React from 'react';
 
 const ${capitalizedModuleName}Page: React.FC = () => (
@@ -97,12 +108,10 @@ const ${capitalizedModuleName}Page: React.FC = () => (
 
 export default ${capitalizedModuleName}Page;
 `;
-    fs.writeFileSync(filePath, content);
-    console.log(`Created file: ${filePath}`);
-  } 
-  else if (folder === 'components') {
+    return { fileName, content };
+  },
+  components: () => {
     const fileName = `${capitalizedModuleName}Component.tsx`;
-    const filePath = path.join(folderPath, fileName);
     const content = `import React from 'react';
 
 const ${capitalizedModuleName}Component: React.FC = () => (
@@ -113,16 +122,23 @@ const ${capitalizedModuleName}Component: React.FC = () => (
 
 export default ${capitalizedModuleName}Component;
 `;
-    fs.writeFileSync(filePath, content);
-    console.log(`Created file: ${filePath}`);
-  } else if (folder === 'slice') {
+    return { fileName, content };
+  },
+  slice: () => {
     const fileName = `${moduleName}Slice.ts`;
-    const filePath = path.join(folderPath, fileName);
     const content = `// Add state logic for ${moduleName} if needed.
 `;
-    fs.writeFileSync(filePath, content);
-    console.log(`Created file: ${filePath}`);
-  }
+    return { fileName, content };
+  },
+};
+
+const folders = Object.keys(folderFileGenerators);
+
+folders.forEach(folder => {
+  const folderPath = path.join(moduleBasePath, folder);
+  createFolder(folderPath);
+  const { fileName, content } = folderFileGenerators[folder]();
+  createFile(folderPath, fileName, content);
 });
 
 console.log(`Module "${moduleName}" created successfully!`);

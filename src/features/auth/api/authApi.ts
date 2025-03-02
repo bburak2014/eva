@@ -7,14 +7,19 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  ApiStatus: boolean | any;
-  ApiStatusCode: number | any;
+  ApiStatus: boolean;
+  ApiStatusCode: number;
   Data: {
     AccessToken: string;
     TokenType: string;
     ExpiresAt: string;
 
   };
+}
+interface UserInformationResponse {
+  storeId: string;
+  marketplaceName: string;
+  // diğer kullanıcı bilgileri...
 }
 
 export const authApi = createApi({
@@ -36,7 +41,13 @@ export const authApi = createApi({
         },
       }),
     }),
+    getUserInformation: builder.query<UserInformationResponse, void>({
+      query: () => ({
+        url: '/user/user-information',
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation ,useGetUserInformationQuery} = authApi;

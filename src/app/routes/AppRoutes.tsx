@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import NotFound from '@/shared/components/common/error/NotFound';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFalBackComponent from '@/shared/components/common/error/ErrorFalBack';
@@ -29,9 +29,10 @@ const AppRoutes: React.FC = () => {
   return (
     <ErrorBoundary
       FallbackComponent={ErrorFalBackComponent}
-      onReset={() => { }}>
+      onReset={() => { console.log('ErrorBoundary reset triggered') }}>
       <Suspense fallback={<LoadingSpinner fullScreen />}>
         <Routes>
+        <Route path="/" element={<Navigate to="/auth" replace />} />
           {matchedModules.map(({ Component }, idx) => (
             <Route key={idx} path="/*" element={<Component />} />
           ))}
