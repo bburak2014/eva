@@ -8,7 +8,6 @@ import {
   SkuDataItem,
   SkuRefundRateItem
 } from '../api/dashboardApi';
-import LoadingSpinner from '@/shared/components/common/loading/Loading';
 import InlineLoading from '@/shared/components/common/loading/InlineLoading';
 
 interface UserData {

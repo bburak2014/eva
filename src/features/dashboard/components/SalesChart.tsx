@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/app/store';
 import { setSelectedDay, toggleSelectedDate, resetDashboardState } from '../slice/dashboardSlice';
@@ -15,17 +15,11 @@ interface MyTooltipContext {
   x: string | number;
   points: Array<{
     series: { name: string; color: string };
-    y: number;
+    point: { y: number };
   }>;
 }
 
-/**
- * items: API'den gelen veri listesi (ör. overviewData.Data.item)
- * valueKey: item üzerinde alacağımız alan adı (ör. "fbaAmount", "fbmAmount", "profit")
- * defaultColor: normal durumda sütunun rengi
- * highlightColors: [ilkKolonRengi, ikinciKolonRengi]
- * selectedDates: Redux'ta tutulan en fazla 2 tarih (["2025-02-01", "2025-02-02"])
- */
+
 function buildStackedData(
   items: any[],
   valueKey: string,
@@ -34,20 +28,13 @@ function buildStackedData(
   selectedDates: string[]
 ) {
   return items.map((item: any) => {
-    // selectedDates içinde bu item's date'i arıyoruz
     const indexInSelected = selectedDates.indexOf(item.date);
-
-    // Varsayılan renk
     let color = defaultColor;
-    // Eğer bu tarih selectedDates'in ilk elemanıysa highlightColors[0] 
     if (indexInSelected === 0) {
       color = highlightColors[0];
-    }
-    // Eğer bu tarih selectedDates'in ikinci elemanıysa highlightColors[1]
-    else if (indexInSelected === 1) {
+    } else if (indexInSelected === 1) {
       color = highlightColors[1];
     }
-
     return {
       y: item[valueKey] || 0,
       color,
@@ -61,6 +48,7 @@ const SalesChart: React.FC<UserData> = (props) => {
   const dispatch = useDispatch();
   const selectedDay = useSelector((state: RootState) => state.dashboard.selectedDay);
   const selectedDates = useSelector((state: RootState) => state.dashboard.selectedDates);
+  const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
 
   const { data: overviewData, error, isLoading } = useGetDailySalesOverviewQuery({
     customDateData: null,
@@ -70,6 +58,17 @@ const SalesChart: React.FC<UserData> = (props) => {
     requestStatus: 0,
     sellerId
   });
+
+  useEffect(() => {
+    if (chartComponentRef.current) {
+      const chart = chartComponentRef.current.chart;
+      if (isLoading) {
+        chart.showLoading('Loading...');
+      } else {
+        chart.hideLoading();
+      }
+    }
+  }, [isLoading]);
 
   const chartOptions = useMemo(() => {
     const items = overviewData?.Data?.item || [];
@@ -85,16 +84,19 @@ const SalesChart: React.FC<UserData> = (props) => {
 
     const categories = items.map((item: any) => item.date);
 
-    // 1. Profit için veriler
+    const shippingMap = items.reduce((acc: Record<string, number>, item: any) => {
+      acc[item.date] = (item.fbaShippingAmount || 0) + (item.fbmShippingAmount || 0);
+      return acc;
+    }, {});
+
     const profitData = buildStackedData(
       items,
       'profit',
-      '#5edcbf',               // Normal durum rengi
-      ['#5dd17e', '#4bbb5d'], // [ilkKolonRengi, ikinciKolonRengi] (örnek)
+      '#5edcbf',
+      ['#5dd17e', '#4bbb5d'],
       selectedDates
     );
 
-    // 2. FBA Sales
     const fbaData = buildStackedData(
       items,
       'fbaAmount',
@@ -103,7 +105,6 @@ const SalesChart: React.FC<UserData> = (props) => {
       selectedDates
     );
 
-    // 3. FBM Sales
     const fbmData = buildStackedData(
       items,
       'fbmAmount',
@@ -111,7 +112,6 @@ const SalesChart: React.FC<UserData> = (props) => {
       ['#5707f7', '#0733f7'],
       selectedDates
     );
-
 
     return {
       chart: { type: 'column', backgroundColor: 'transparent' },
@@ -126,22 +126,47 @@ const SalesChart: React.FC<UserData> = (props) => {
         verticalAlign: 'bottom'
       },
       tooltip: {
+        useHTML: true,
         shared: true,
         formatter: function (this: MyTooltipContext) {
-          let s = ``;
-          let totalSales = 0;
-          let profit = 0;
-          let fba = 0;
-          let fbm = 0;
-          let shipping = 0;
+          let fba = 0, fbm = 0, profit = 0;
+          this.points.forEach(point => {
+            if (point.series.name === 'FBA Sales') {
+              fba = point.point.y;
+            } else if (point.series.name === 'FBM Sales') {
+              fbm = point.point.y;
+            } else if (point.series.name === 'Profit') {
+              profit = point.point.y;
+            }
+          });
+          const totalSales = fba + fbm;
+          const shipping = shippingMap[this.x] || 0;
 
-          totalSales = fba + fbm;
-          s += `<br/><b>Total Sales:</b> ${totalSales}<br/>`;
-          s += `<b>Shipping:</b> ${shipping}<br/>`;
-          s += `<b>Profit:</b> ${profit}<br/>`;
-          s += `<b>FBA Sales:</b> ${fba}<br/>`;
-          s += `<b>FBM Sales:</b> ${fbm}<br/>`;
-          return s;
+          return `
+            <div class="p-2 text-sm text-gray-800">
+              <div class="font-bold mb-1">${this.x}</div>
+              <div class="flex justify-between">
+                <span>Total Sales:</span>
+                <span class="font-semibold">$${totalSales}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Shipping:</span>
+                <span class="font-semibold">$${shipping}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Profit:</span>
+                <span class="font-semibold">$${profit}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>FBA Sales:</span>
+                <span class="font-semibold">$${fba}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>FBM Sales:</span>
+                <span class="font-semibold">$${fbm}</span>
+              </div>
+            </div>
+          `;
         }
       },
       plotOptions: {
@@ -165,18 +190,17 @@ const SalesChart: React.FC<UserData> = (props) => {
         },
         {
           name: 'FBA Sales',
-          data: fbaData, 
+          data: fbaData,
           stack: 'sales',
           color: '#B8A1FB'
         },
         {
           name: 'FBM Sales',
-          data: fbmData,       // buildStackedData'dan gelen { y, color } objeleri
+          data: fbmData,
           stack: 'sales',
           color: '#7A6AFB'
         }
       ]
-
     };
   }, [overviewData, selectedDates, dispatch, selectedDay, marketplace, sellerId]);
 
@@ -187,8 +211,8 @@ const SalesChart: React.FC<UserData> = (props) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow">
-      <div className="flex justify-between items-center mb-2">
+    <div className="bg-white p-4 rounded shadow min-h-60 w-full">
+       <div className="flex justify-between items-center mb-2">
         <h2 className="text-lg font-semibold">Daily Sales</h2>
         <select
           value={selectedDay}
@@ -202,12 +226,10 @@ const SalesChart: React.FC<UserData> = (props) => {
           <option value={7}>Last 7 days</option>
         </select>
       </div>
-      {isLoading ? (
-        <p className="text-gray-500">Loading chart...</p>
-      ) : error ? (
+      { error ? (
         <p className="text-red-500">Error loading chart data.</p>
       ) : (
-        <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+        <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartComponentRef}/>
       )}
     </div>
   );
