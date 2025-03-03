@@ -17,10 +17,18 @@ export interface LoginResponse {
   };
 }
 interface UserInformationResponse {
-  storeId: string;
-  marketplaceName: string;
-  // diğer kullanıcı bilgileri...
+  Data: {
+    user: {
+      store: {
+        storeId: string;
+        marketplaceName: string;
+        // other store properties if needed
+      }[];
+      email: string;
+     };
+   };
 }
+
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -41,13 +49,16 @@ export const authApi = createApi({
         },
       }),
     }),
-    getUserInformation: builder.query<UserInformationResponse, void>({
-      query: () => ({
+    getUserInformation: builder.mutation<UserInformationResponse, { email: string }>({
+      query: ({ email }) => ({
         url: '/user/user-information',
-        method: 'GET',
+        method: 'POST',
+        body: { email: email },
       }),
     }),
+    
+    
   }),
 });
 
-export const { useLoginMutation ,useGetUserInformationQuery} = authApi;
+export const { useLoginMutation, useGetUserInformationMutation } = authApi;

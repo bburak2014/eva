@@ -5,6 +5,7 @@ import { useLoginMutation } from '@/features/auth/api/authApi';
 import { toastManager } from '@/shared/utils/toastManager';
 import InlineLoading from '@/shared/components/common/loading/InlineLoading';
 import { useNavigate } from 'react-router-dom';
+import localStorageManager from '@/shared/utils/localStorageManager';
 
 
 interface LoginValues {
@@ -38,6 +39,7 @@ const LoginForm: React.FC = () => {
       if (result.ApiStatus && result.ApiStatusCode === 200) {
 
         toastManager.showToast('Login successful!', 'success', 3000);
+        localStorageManager.set('email', values.email);
         navigate('/dashboard');
 
       } else {

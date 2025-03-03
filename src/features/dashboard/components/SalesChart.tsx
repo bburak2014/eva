@@ -15,7 +15,8 @@ interface MyTooltipContext {
     profit: number;
   };
 }
-interface userData {
+
+interface UserData {
   sellerId: string;
   marketplace: string;
 }
@@ -29,15 +30,12 @@ const getTooltipContent = (x: string | number, point: any) => {
           FBM Sales: ${point.fbmAmount}`;
 };
 
-
-const SalesChart: React.FC<userData> = (props) => {
-  const { sellerId, marketplace } = props || null;
+const SalesChart: React.FC<UserData> = (props) => {
+  const { sellerId, marketplace } = props;
   const dispatch = useDispatch();
   const selectedDay = useSelector((state: RootState) => state.dashboard.selectedDay);
 
-
-
-  // Fetch daily sales overview data using RTK Query (auto-fetch on selectedDay or other params change)
+  // API'den veriyi çekiyoruz
   const { data: overviewData, error, isLoading } = useGetDailySalesOverviewQuery({
     customDateData: null,
     day: selectedDay,
@@ -47,20 +45,31 @@ const SalesChart: React.FC<userData> = (props) => {
     sellerId
   });
 
-  // Prepare Highcharts configuration
+  // Yeni response yapısına göre verileri dönüştürüyoruz
   const chartOptions = useMemo(() => {
-    if (!overviewData || !overviewData.dateList?.length) {
-      return <p className="text-gray-500">No chart data available.</p>;
+    // overviewData.Data.item dizisini alıyoruz
+    const items = overviewData?.Data?.item || [];
+
+    if (!items.length) {
+      return {
+        title: { text: '' },
+        series: [],
+        xAxis: { categories: [] },
+        yAxis: { title: { text: 'Sales' } },
+        tooltip: { formatter: function () { return 'No data available.'; } }
+      };
     }
-    const categories = overviewData.dateList;
-    const seriesData = overviewData.profit.map((_, index) => ({
-      y: overviewData.fbaAmount[index] + overviewData.fbmAmount[index],
-      profit: overviewData.profit[index],
-      fbaAmount: overviewData.fbaAmount[index],
-      fbmAmount: overviewData.fbmAmount[index],
-      fbaShippingAmount: overviewData.fbaShippingAmount[index],
-      category: categories[index],
+    
+    const categories = items.map((item: any) => item.date);
+    const seriesData = items.map((item: any) => ({
+      y: item.fbaAmount + item.fbmAmount,
+      profit: item.profit,
+      fbaAmount: item.fbaAmount,
+      fbmAmount: item.fbmAmount,
+      fbaShippingAmount: item.fbaShippingAmount,
+      category: item.date,
     }));
+
     return {
       chart: { type: 'column', backgroundColor: 'transparent' },
       title: { text: '' },
@@ -71,7 +80,6 @@ const SalesChart: React.FC<userData> = (props) => {
           return getTooltipContent(this.x, this.point);
         }
       },
-
       plotOptions: {
         series: {
           point: {
@@ -82,21 +90,18 @@ const SalesChart: React.FC<userData> = (props) => {
             }
           }
         }
-      }
-      ,
+      },
       series: [{
         name: 'Sales',
         type: 'column',
         data: seriesData,
       }]
     };
-  }, [overviewData, dispatch]);
+  }, [overviewData, dispatch, selectedDay, marketplace, sellerId]);
 
-
-  // Handler for changing the day range selection
+  // Gün aralığı seçimi için handler
   const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newDay = Number(e.target.value);
-    // Reset any selected dates (clear table selection) when changing range
     dispatch(resetDashboardState());
     dispatch(setSelectedDay(newDay));
   };

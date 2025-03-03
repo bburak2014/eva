@@ -4,7 +4,7 @@ import type { RootState } from '@/app/store';
 
 export default function useAuth() {
   const { accessToken } = useSelector((state: RootState) => state.auth);
-  console.log('useAuth:', accessToken);
+
   const isLoggedIn = Boolean(
     accessToken  
   );

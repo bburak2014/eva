@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/app/store';
 import SalesChart from '../components/SalesChart';
 import SalesTable from '../components/SalesTable';
-import { useGetUserInformationQuery } from '@/features/auth/api/authApi';
+import { useGetUserInformationMutation } from '@/features/auth/api/authApi';
 import LoadingSpinner from '@/shared/components/common/loading/Loading';
+import localStorageManager from '@/shared/utils/localStorageManager';
 
 const DashboardPage: React.FC = () => {
   // Access selected dates from Redux to determine if table should be shown
   const selectedDates = useSelector((state: RootState) => state.dashboard.selectedDates);
-  const { data, isLoading, error } = useGetUserInformationQuery();
-  const sellerId = data?.storeId || '';
-  const marketplace = data?.marketplaceName || '';
+  const [getUserInformation, { data, error, isLoading }] = useGetUserInformationMutation();
+  const email = localStorageManager.get('email') as string | null;
+
+  useEffect(() => {
+    if (email) {
+      getUserInformation({ email });
+    }
+  }, [email, getUserInformation]);
+
+  const sellerId = data?.Data?.user?.store?.[0]?.storeId || '';
+  const marketplace = data?.Data?.user?.store?.[0]?.marketplaceName || '';
 
   const userData = {
     sellerId,
@@ -38,15 +47,17 @@ const DashboardPage: React.FC = () => {
 
 
   return (
-    <div className="container mx-auto p-4">
-      <SalesChart {...userData} />
-
-      {selectedDates.length > 0 && (
-        <div className="mt-8">
-          <SalesTable {...userData} />
-        </div>
-      )}
-    </div>
+    <>
+      {(sellerId && marketplace) &&
+        <div className="container mx-auto p-4">
+          <SalesChart {...userData} />
+          {selectedDates.length > 0 && (
+            <div className="mt-8">
+              <SalesTable {...userData} />
+            </div>
+          )}
+        </div>}
+    </>
   );
 };
 

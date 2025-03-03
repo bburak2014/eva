@@ -1,4 +1,3 @@
-// features/dashboard/components/SalesTable.tsx
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '@/app/store';
@@ -14,17 +13,15 @@ import LoadingSpinner from '@/shared/components/common/loading/Loading';
 interface UserData {
   sellerId: string;
   marketplace: string;
-
 }
+
 const SalesTable: React.FC<UserData> = (props) => {
-  const { sellerId, marketplace } = props || null;
+  const { sellerId, marketplace } = props;
   const dispatch = useDispatch<AppDispatch>();
   const { selectedDates, currentPage } = useSelector((state: RootState) => state.dashboard);
   const [skuData, setSkuData] = useState<SkuDataItem[]>([]);
   const [lastPageFetched, setLastPageFetched] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-
-
 
   const [triggerSkuList, skuListResult] = useLazyGetDailySalesSkuListQuery();
   const [triggerRefund, refundResult] = useLazyGetSkuRefundRateQuery();
@@ -52,27 +49,41 @@ const SalesTable: React.FC<UserData> = (props) => {
       sellerId
     };
 
-    triggerSkuList(params).unwrap().then((res) => {
-      const items = res.skuList;
-      const fetchedCount = items.length;
-      const skuCodes = items.map((item: SkuDataItem) => item.sku);
-      return triggerRefund({ skuList: skuCodes }).unwrap().then((refundRes) => {
-        const refundItems = refundRes as SkuRefundRateItem[];
-        const refundMap: Record<string, number> = {};
-        refundItems.forEach(r => { refundMap[r.sku] = r.refundRate; });
-        const combinedItems = items.map(item => ({
-          ...item,
-          refundRate: refundMap[item.sku] ?? 0
-        }));
-        setSkuData(combinedItems);
-        setLastPageFetched(1);
-        if (fetchedCount < 30) {
-          setHasMore(false);
-        }
+    triggerSkuList(params)
+      .unwrap()
+      .then((res) => {
+        // API yanıtındaki skuList "res.Data.item.skuList" içinde yer alıyor.
+        const items = res.Data.item.skuList;
+        const fetchedCount = items.length;
+        const skuCodes = items.map((item: SkuDataItem) => item.sku);
+        return triggerRefund({
+          marketplace,
+          sellerId,
+          skuList: skuCodes,
+          requestedDay: 0
+        })
+          .unwrap()
+          .then((refundRes) => {
+            // Refund servisi yanıtı "refundRes.Data" dizisi şeklinde geliyor.
+            const refundItems = refundRes.Data as SkuRefundRateItem[];
+            const refundMap: Record<string, number> = {};
+            refundItems.forEach(r => {
+              refundMap[r.sku] = r.refundRate;
+            });
+            const combinedItems = items.map(item => ({
+              ...item,
+              refundRate: refundMap[item.sku] ?? 0
+            }));
+            setSkuData(combinedItems);
+            setLastPageFetched(1);
+            if (fetchedCount < 30) {
+              setHasMore(false);
+            }
+          });
+      })
+      .catch(err => {
+        console.error('Error fetching SKU list/refund data', err);
       });
-    }).catch(err => {
-      console.error('Error fetching SKU list/refund data', err);
-    });
   }, [dispatch, selectedDates, triggerSkuList, triggerRefund, marketplace, sellerId]);
 
   useEffect(() => {
@@ -89,27 +100,39 @@ const SalesTable: React.FC<UserData> = (props) => {
         salesDate2: selectedDates.length === 2 ? selectedDates[1] : "",
         sellerId
       };
-      triggerSkuList(params).unwrap().then(res => {
-        const newItems = res.skuList;
-        const fetchedCount = newItems.length;
-        const skuCodes = newItems.map((item: SkuDataItem) => item.sku);
-        return triggerRefund({ skuList: skuCodes }).unwrap().then(refundRes => {
-          const refundItems = refundRes as SkuRefundRateItem[];
-          const refundMap: Record<string, number> = {};
-          refundItems.forEach(r => { refundMap[r.sku] = r.refundRate; });
-          const combinedNewItems = newItems.map(item => ({
-            ...item,
-            refundRate: refundMap[item.sku] ?? 0
-          }));
-          setSkuData(prev => [...prev, ...combinedNewItems]);
-          setLastPageFetched(nextPageNumber);
-          if (fetchedCount < 30) {
-            setHasMore(false);
-          }
+      triggerSkuList(params)
+        .unwrap()
+        .then(res => {
+          const newItems = res.Data.item.skuList;
+          const fetchedCount = newItems.length;
+          const skuCodes = newItems.map((item: SkuDataItem) => item.sku);
+          return triggerRefund({
+            marketplace,
+            sellerId,
+            skuList: skuCodes,
+            requestedDay: 0
+          })
+            .unwrap()
+            .then(refundRes => {
+              const refundItems = refundRes.Data as SkuRefundRateItem[];
+              const refundMap: Record<string, number> = {};
+              refundItems.forEach(r => {
+                refundMap[r.sku] = r.refundRate;
+              });
+              const combinedNewItems = newItems.map(item => ({
+                ...item,
+                refundRate: refundMap[item.sku] ?? 0
+              }));
+              setSkuData(prev => [...prev, ...combinedNewItems]);
+              setLastPageFetched(nextPageNumber);
+              if (fetchedCount < 30) {
+                setHasMore(false);
+              }
+            });
+        })
+        .catch(err => {
+          console.error('Error fetching additional SKU data', err);
         });
-      }).catch(err => {
-        console.error('Error fetching additional SKU data', err);
-      });
     }
   }, [currentPage, selectedDates, skuData.length, lastPageFetched, hasMore, triggerSkuList, triggerRefund, marketplace, sellerId]);
 
@@ -160,9 +183,13 @@ const SalesTable: React.FC<UserData> = (props) => {
                 {compareMode ? (
                   <>
                     <td className="px-2 py-1 text-right">${item.fbaAmount + item.fbmAmount}</td>
-                    <td className="px-2 py-1 text-right">${item.fbaAmount2 && item.fbmAmount2 ? (item.fbaAmount2 + item.fbmAmount2) : '-'}</td>
                     <td className="px-2 py-1 text-right">
-                      {item.fbaAmount2 && item.fbmAmount2 ? `$${(item.fbaAmount2 + item.fbmAmount2) - (item.fbaAmount + item.fbmAmount)}` : '-'}
+                      {item.fbaAmount2 && item.fbmAmount2 ? (item.fbaAmount2 + item.fbmAmount2) : '-'}
+                    </td>
+                    <td className="px-2 py-1 text-right">
+                      {item.fbaAmount2 && item.fbmAmount2
+                        ? `$${(item.fbaAmount2 + item.fbmAmount2) - (item.fbaAmount + item.fbmAmount)}`
+                        : '-'}
                     </td>
                   </>
                 ) : (
@@ -189,7 +216,6 @@ const SalesTable: React.FC<UserData> = (props) => {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage >= Math.ceil(skuData.length / 10) && !hasMore}
-
             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
           >
             Next

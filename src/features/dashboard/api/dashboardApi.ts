@@ -11,13 +11,56 @@ export interface DailySalesOverviewParams {
   sellerId: string;
 }
 // src/features/dashboard/api/dashboardApi.ts
-interface DailySalesOverviewResponse {
-  dateList: string[];
-  profit: number[];
-  fbaAmount: number[];
-  fbmAmount: number[];
-  fbaShippingAmount: number[]; 
+export interface DailySalesOverviewResponse {
+  ApiStatus: boolean;
+  ApiStatusCode: number;
+  ApiStatusMessage: string;
+  Data: {
+    item: DailySalesOverviewItem[];
+    Currency: string;
+    isYoyExist: boolean;
+  };
 }
+
+export interface DailySalesOverviewItem {
+  date: string;
+  amount: number;
+  fbaAmount: number;
+  fbmAmount: number;
+  orderCount: number;
+  fbaOrderCount: number;
+  fbmOrderCount: number;
+  unitCount: number;
+  fbaUnitCount: number;
+  fbmUnitCount: number;
+  avgSalesPrev30Days: number;
+  prevYearDate: number;
+  prevYearAmount: number;
+  prevYearFbaAmount: number;
+  prevYearFbmAmount: number;
+  prevYearShippingAmount: number;
+  prevYearFbaShippingAmount: number;
+  prevYearFbmShippingAmount: number;
+  prevYearOrderCount: number;
+  prevYearUnitCount: number;
+  yoy30DailySalesGrowth: number;
+  prevYearAvgSalesPrev30Days: number;
+  profit: number;
+  cogs: number;
+  amazonExpense: number;
+  totalExpense: number;
+  shippingAmount: number;
+  fbaShippingAmount: number;
+  fbmShippingAmount: number;
+  avgProfitPrev30Days: number;
+  avgAdvertisingCostPrev30Days: number;
+  advertisingCost: number;
+  acos: number;
+  refundTotalAmount: number;
+  totalVatAmount: number;
+  otherFee: number;
+}
+
 
 export interface SkuDataItem {
   sku: string;
@@ -41,17 +84,41 @@ export interface DailySalesSkuListParams {
   sellerId: string;
 }
 export interface DailySalesSkuListResponse {
-  skuList: SkuDataItem[];   
+  ApiStatus: boolean;
+  ApiStatusCode: number;
+  ApiStatusMessage: string;
+  Data: {
+    item: {
+      selectedDate: string;
+      selectedDate2: string;
+      totalSale: number;
+      totalShippingAmount: number;
+      totalSale2: number;
+      totalShippingAmount2: number;
+      skuList: SkuDataItem[];
+    };
+    Currency: string;
+  };
 }
 
+
 export interface SkuRefundRateParams {
-  skuList: string[];      
+  marketplace: string;
+  sellerId: string;
+  skuList: string[];
+  requestedDay: number;
 }
+
 export interface SkuRefundRateItem {
   sku: string;
   refundRate: number;
 }
-export type SkuRefundRateResponse = SkuRefundRateItem[];
+export interface SkuRefundRateResponse {
+  ApiStatus: boolean;
+  ApiStatusCode: number;
+  ApiStatusMessage: string;
+  Data: SkuRefundRateItem[];
+}
 
 // Create RTK Query API slice for dashboard-related endpoints
 export const dashboardApi = createApi({
@@ -88,8 +155,6 @@ export const dashboardApi = createApi({
 // Export hooks for usage in components
 export const {
   useGetDailySalesOverviewQuery,
-  useGetDailySalesSkuListQuery,
-  useGetSkuRefundRateQuery,
   useLazyGetDailySalesSkuListQuery,
   useLazyGetSkuRefundRateQuery
 } = dashboardApi;
