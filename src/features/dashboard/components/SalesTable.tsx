@@ -9,6 +9,7 @@ import {
   SkuRefundRateItem
 } from '../api/dashboardApi';
 import LoadingSpinner from '@/shared/components/common/loading/Loading';
+import InlineLoading from '@/shared/components/common/loading/InlineLoading';
 
 interface UserData {
   sellerId: string;
@@ -160,8 +161,8 @@ const SalesTable: React.FC<UserData> = (props) => {
   return (
     <div className="bg-white p-4 rounded shadow">
       {loading ? (
-        <div className="flex justify-center py-4">
-          <LoadingSpinner />
+        <div className="flex justify-center py-4 relative">
+          <InlineLoading size={32} />
         </div>
       ) : isError ? (
         <div className="text-red-500 text-center">Error loading table data. Please try again.</div>
