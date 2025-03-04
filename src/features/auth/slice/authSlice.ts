@@ -2,11 +2,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { authApi } from '@/features/auth/api/authApi';
 import localStorageManager from '@/shared/utils/localStorageManager';
+import { AuthState } from '@/features/auth/types/authTypes';
 
-interface AuthState {
-    accessToken: string | null;
-    expiresAt: string | null;
-}
 
 const initialState: AuthState = {
     accessToken: localStorageManager.get('access_token') || null,

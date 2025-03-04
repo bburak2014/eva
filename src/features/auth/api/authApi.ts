@@ -1,33 +1,7 @@
 // src/features/auth/api/authApi.ts
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  ApiStatus: boolean;
-  ApiStatusCode: number;
-  Data: {
-    AccessToken: string;
-    TokenType: string;
-    ExpiresAt: string;
-
-  };
-}
-interface UserInformationResponse {
-  Data: {
-    user: {
-      store: {
-        storeId: string;
-        marketplaceName: string;
-        // other store properties if needed
-      }[];
-      email: string;
-     };
-   };
-}
+import { LoginRequest, LoginResponse, UserInformationResponse } from '@/features/auth/types/authTypes';
 
 
 export const authApi = createApi({
@@ -56,8 +30,8 @@ export const authApi = createApi({
         body: { email: email },
       }),
     }),
-    
-    
+
+
   }),
 });
 

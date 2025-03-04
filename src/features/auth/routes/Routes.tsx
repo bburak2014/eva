@@ -1,7 +1,7 @@
 // src/features/auth/routes/authRoutes.tsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import AuthPage from '../pages/AuthPage';
+import AuthPage from '@/features/auth/pages/AuthPage';
 import NotFound from '@/shared/components/common/error/NotFound';
 
 export const basePath = "/auth";

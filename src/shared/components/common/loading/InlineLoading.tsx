@@ -1,11 +1,6 @@
 // src/components/InlineLoading.tsx
+import { InlineLoadingProps } from '@/shared/types/commonTypes';
 import React from 'react';
-
-interface InlineLoadingProps {
-  size?: number;     
-  color?: string;     
-  className?: string;
-}
 
 const InlineLoading: React.FC<InlineLoadingProps> = ({
   size = 16,

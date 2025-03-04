@@ -1,23 +1,11 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/app/store';
-import { setSelectedDay, toggleSelectedDate, resetDashboardState } from '../slice/dashboardSlice';
-import { useGetDailySalesOverviewQuery } from '../api/dashboardApi';
+import { setSelectedDay, toggleSelectedDate, resetDashboardState } from '@/features/dashboard/slice/dashboardSlice';
+import { useGetDailySalesOverviewQuery } from '@/features/dashboard/api/dashboardApi';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-
-interface UserData {
-  sellerId: string;
-  marketplace: string;
-}
-
-interface MyTooltipContext {
-  x: string | number;
-  points: Array<{
-    series: { name: string; color: string };
-    point: { y: number };
-  }>;
-}
+import { UserData, MyTooltipContext } from '@/features/dashboard/types/dashboardTypes';
 
 
 function buildStackedData(
@@ -212,7 +200,7 @@ const SalesChart: React.FC<UserData> = (props) => {
 
   return (
     <div className="bg-white p-4 rounded shadow min-h-60 w-full">
-       <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center mb-2">
         <h2 className="text-lg font-semibold">Daily Sales</h2>
         <select
           value={selectedDay}
@@ -226,10 +214,10 @@ const SalesChart: React.FC<UserData> = (props) => {
           <option value={7}>Last 7 days</option>
         </select>
       </div>
-      { error ? (
+      {error ? (
         <p className="text-red-500">Error loading chart data.</p>
       ) : (
-        <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartComponentRef}/>
+        <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartComponentRef} />
       )}
     </div>
   );

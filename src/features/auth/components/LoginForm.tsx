@@ -6,12 +6,8 @@ import { toastManager } from '@/shared/utils/toastManager';
 import InlineLoading from '@/shared/components/common/loading/InlineLoading';
 import { useNavigate } from 'react-router-dom';
 import localStorageManager from '@/shared/utils/localStorageManager';
+import { LoginValues } from '@/features/auth/types/authTypes';
 
-
-interface LoginValues {
-  email: string;
-  password: string;
-}
 
 const LoginForm: React.FC = () => {
   const [login] = useLoginMutation();

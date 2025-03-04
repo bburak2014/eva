@@ -1,12 +1,8 @@
 // Add state logic for dashboard if needed.
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { toastManager } from '@/shared/utils/toastManager';
+import { DashboardState } from '@/features/dashboard/types/dashboardTypes';
 
-interface DashboardState {
-    selectedDay: number;
-    selectedDates: string[];
-    currentPage: number;
-}
 
 const initialState: DashboardState = {
     selectedDay: 30,

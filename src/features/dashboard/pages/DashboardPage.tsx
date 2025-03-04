@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/app/store';
-import SalesChart from '../components/SalesChart';
-import SalesTable from '../components/SalesTable';
+import SalesChart from '@/features/dashboard/components/SalesChart';
+import SalesTable from '@/features/dashboard/components/SalesTable';
 import { useGetUserInformationMutation } from '@/features/auth/api/authApi';
 import LoadingSpinner from '@/shared/components/common/loading/Loading';
 import localStorageManager from '@/shared/utils/localStorageManager';

@@ -1,7 +1,7 @@
 import React from 'react';
-import LoginForm from '../components/LoginForm';
+import LoginForm from '@/features/auth/components/LoginForm';
 const AuthPage: React.FC = () => (
     <LoginForm />
- );
+);
 
 export default AuthPage;
