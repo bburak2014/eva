@@ -1,3 +1,4 @@
+// src/features/dashboard/pages/DashboardPage.tsx
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/app/store';
@@ -49,10 +50,10 @@ const DashboardPage: React.FC = () => {
   return (
     <>
       {(sellerId && marketplace) &&
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 flex flex-col gap-10 h-full">
           <SalesChart {...userData} />
           {selectedDates.length > 0 && (
-            <div className="mt-8">
+            <div className="">
               <SalesTable {...userData} />
             </div>
           )}

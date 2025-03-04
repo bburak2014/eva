@@ -1,4 +1,4 @@
-// dashboard api
+// src/features/dashboard/types/dashboardTypes.ts
 export interface DailySalesOverviewParams {
     customDateData: null | string;
     day: number;
@@ -70,6 +70,8 @@ export interface SkuDataItem {
     productName?: string;
     qty2?: number;
     qty?: number;
+    amount?: number;
+    amount2?:number;
 
 }
 

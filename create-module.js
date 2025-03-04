@@ -130,6 +130,13 @@ export default ${capitalizedModuleName}Component;
 `;
     return { fileName, content };
   },
+  types: () => {
+    const fileName = `${moduleName}Types.ts`;
+    const content = `// Types for the ${capitalizedModuleName} module.
+// Define module-specific types here.
+`;
+    return { fileName, content };
+  },
 };
 
 const folders = Object.keys(folderFileGenerators);

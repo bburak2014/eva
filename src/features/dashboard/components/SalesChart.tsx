@@ -1,3 +1,4 @@
+// src/features/dashboard/components/SalesChart.tsx
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/app/store';
@@ -6,30 +7,9 @@ import { useGetDailySalesOverviewQuery } from '@/features/dashboard/api/dashboar
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { UserData, MyTooltipContext } from '@/features/dashboard/types/dashboardTypes';
+import { buildStackedData } from '@/shared/utils/helpers';
 
 
-function buildStackedData(
-  items: any[],
-  valueKey: string,
-  defaultColor: string,
-  highlightColors: [string, string],
-  selectedDates: string[]
-) {
-  return items.map((item: any) => {
-    const indexInSelected = selectedDates.indexOf(item.date);
-    let color = defaultColor;
-    if (indexInSelected === 0) {
-      color = highlightColors[0];
-    } else if (indexInSelected === 1) {
-      color = highlightColors[1];
-    }
-    return {
-      y: item[valueKey] || 0,
-      color,
-      category: item.date
-    };
-  });
-}
 
 const SalesChart: React.FC<UserData> = (props) => {
   const { sellerId, marketplace } = props;

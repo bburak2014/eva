@@ -1,3 +1,4 @@
+// src/features/dashboard/api/dashboardApi.ts
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReauth';
 import { DailySalesOverviewParams, DailySalesOverviewResponse, DailySalesSkuListParams, DailySalesSkuListResponse, SkuRefundRateParams, SkuRefundRateResponse } from '@/features/dashboard/types/dashboardTypes';

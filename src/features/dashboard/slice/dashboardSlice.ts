@@ -1,4 +1,4 @@
-// Add state logic for dashboard if needed.
+// src/features/dashboard/slice/dashboardSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { toastManager } from '@/shared/utils/toastManager';
 import { DashboardState } from '@/features/dashboard/types/dashboardTypes';

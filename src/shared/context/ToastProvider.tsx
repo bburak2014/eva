@@ -1,4 +1,4 @@
-// src/context/ToastContext.tsx
+// src/shared/context/ToastProvider.tsx
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 import { toastManager } from '@/shared/utils/toastManager';

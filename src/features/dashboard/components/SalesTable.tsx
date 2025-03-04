@@ -1,3 +1,4 @@
+// src/features/dashboard/components/SalesTable.tsx
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '@/app/store';
@@ -9,7 +10,7 @@ import {
 import InlineLoading from '@/shared/components/common/loading/InlineLoading';
 import { getDayName, formatDate, calcAvgPrice } from '@/shared/utils/helpers';
 import { UserData, SkuDataItem, SkuRefundRateItem } from '../types/dashboardTypes';
-
+import { formatRefundRate } from '@/shared/utils/helpers';
 
 const SalesTable: React.FC<UserData> = (props) => {
   const { sellerId, marketplace } = props;
@@ -22,7 +23,7 @@ const SalesTable: React.FC<UserData> = (props) => {
   const [triggerSkuList, skuListResult] = useLazyGetDailySalesSkuListQuery();
   const [triggerRefund, refundResult] = useLazyGetSkuRefundRateQuery();
 
-  // İstek parametrelerini oluşturma
+  // create params
   const createParams = (pageNumber: number) => ({
     isDaysCompare: selectedDates.length === 2 ? 1 : 0,
     marketplace,
@@ -33,7 +34,7 @@ const SalesTable: React.FC<UserData> = (props) => {
     sellerId
   });
 
-  /** Tabloyu ilk yükleme ve tarih değişimi durumunda yenileme */
+  /** Loading the table for the first time and changing it in case of date change */
   useEffect(() => {
     if (selectedDates.length === 0) {
       setSkuData([]);
@@ -82,7 +83,7 @@ const SalesTable: React.FC<UserData> = (props) => {
       });
   }, [dispatch, selectedDates, triggerSkuList, triggerRefund, marketplace, sellerId]);
 
-  /** Sayfa değişiminde ek veri yükleme */
+  /** Loading additional data on page change */
   useEffect(() => {
     if (selectedDates.length === 0) return;
     const totalLoadedPages = Math.ceil(skuData.length / 10);
@@ -124,114 +125,109 @@ const SalesTable: React.FC<UserData> = (props) => {
     }
   }, [currentPage, selectedDates, skuData.length, lastPageFetched, hasMore, triggerSkuList, triggerRefund, marketplace, sellerId]);
 
-  // Yüklenme ve hata durumları
+  // error and loading 
   const loading = skuListResult.isFetching || refundResult.isFetching;
   const isError = skuListResult.isError || refundResult.isError;
 
-  /** Refund formatlama */
-  const formatRefundRate = (rate?: number) => {
-    if (rate === undefined || rate === null) return '-';
-    return `${(rate * 100).toFixed(2)}%`;
-  };
 
-  /** Compare Mode (iki tarih seçili) mi? */
+
+  /** Compare Mode */
   const compareMode = selectedDates.length === 2;
 
 
-  // Çok satırlı header oluşturma
+  // multiple header
   const thead = (
     <thead className="bg-gray-100">
-      <tr>
+      <tr className="text-gray-600 text-sm font-bold">
         <th className="px-2 py-2 text-left">SKU</th>
         <th className="px-2 py-2 text-left">Product Name</th>
-
+  
         {compareMode ? (
           <>
-            <th className="px-2 py-2 text-center">
-              {/* Tek hücrede çok satır */}
-              <div className="font-semibold">{getDayName(selectedDates[0])}</div>
-              <div className="text-xs text-gray-600 mb-1">{formatDate(selectedDates[0])}</div>
-              <div className="text-sm font-medium">Sales / Unit</div>
-              <div className="text-sm font-medium">Avg. Selling Price</div>
+            <th className="px-2 py-2 text-right w-32">
+              <div>{getDayName(selectedDates[0])}</div>
+              <div>{formatDate(selectedDates[0])}</div>
+              <div>Sales / Unit</div>
+              <div>Avg. Selling Price</div>
             </th>
-            <th className="px-2 py-2 text-center">
-              <div className="font-semibold">{getDayName(selectedDates[1])}</div>
-              <div className="text-xs text-gray-600 mb-1">{formatDate(selectedDates[1])}</div>
-              <div className="text-sm font-medium">Sales / Unit</div>
-              <div className="text-sm font-medium">Avg. Selling Price</div>
+            <th className="px-2 py-2 text-right w-32">
+              <div>{getDayName(selectedDates[1])}</div>
+              <div>{formatDate(selectedDates[1])}</div>
+              <div>Sales / Unit</div>
+              <div>Avg. Selling Price</div>
             </th>
-            <th className="px-2 py-2 text-right">Diff</th>
           </>
         ) : (
-          <th className="px-2 py-2 text-center">
-            <div className="font-semibold">{selectedDates[0]}</div>
-            <div className="text-xs text-gray-600 mb-1">{formatDate(selectedDates[0])}</div>
-            <div className="text-sm font-medium">Sales / Unit</div>
-            <div className="text-sm font-medium">Avg. Selling Price</div>
+          <th className="px-2 py-2 text-right w-32">
+            <div>{getDayName(selectedDates[0])}</div>
+            <div>{formatDate(selectedDates[0])}</div>
+            <div>Sales / Unit</div>
+            <div>Avg. Selling Price</div>
           </th>
         )}
-
-        <th className="px-2 py-2 text-right">Refund Rate</th>
+  
+        <th className="px-2 py-2 text-right w-32">Refund Rate</th>
       </tr>
     </thead>
   );
+  
+  
 
-  /** Body Render: her satır ve hücre */
+  /** every cell and row */
   const startIndex = (currentPage - 1) * 10;
   const endIndex = startIndex + 10;
   const pageItems = skuData.slice(startIndex, endIndex);
-
+console.log(pageItems)
   const tbody = (
-    <tbody>
-      {pageItems.map((item, idx) => {
-        const sales1 = (item.fbaAmount || 0) + (item.fbmAmount || 0);
-        const qty1 = (item.qty || 0);
-        const avgPrice1 = calcAvgPrice(sales1, qty1);
+  <tbody>
+    {pageItems.map((item, idx) => {
+      const totalSales1 = item.amount || 0; 
+      const qty1 = item.qty || 0;
+      const avgPrice1 = calcAvgPrice(totalSales1, qty1);
 
-        const sales2 = (item.fbaAmount2 || 0) + (item.fbmAmount2 || 0);
-        const qty2 = (item?.qty2 || 0);
-        const avgPrice2 = calcAvgPrice(sales2, qty2);
+      const totalSales2 = item.amount2 || 0; 
+      const qty2 = item.qty2 || 0;
+      const avgPrice2 = calcAvgPrice(totalSales2, qty2);
 
-        const diff = sales2 - sales1;
+      return (
+        <tr key={idx} className={`border-none text-gray-600 ${idx % 2 === 1 ? 'bg-gray-100' : 'bg-white'}`}>
+          <td className="px-2 py-5">{item.sku}</td>
+          <td className="px-2 py-5">{item.productName}</td>
 
-        return (
-          <tr key={idx} className="border-b">
-            <td className="px-2 py-1">{item.sku}</td>
-            <td className="px-2 py-1">{item.productName}</td>
-
-            {compareMode ? (
-              <>
-                {/* İlk tarih için sales / unit ve alt satırda avg price */}
-                <td className="px-2 py-1 text-right">
-                  <div>{sales1.toFixed(2)}</div>
-                  <div className="text-xs text-gray-500">{avgPrice1}</div>
-                </td>
-                {/* İkinci tarih */}
-                <td className="px-2 py-1 text-right">
-                  <div>{sales2.toFixed(2)}</div>
-                  <div className="text-xs text-gray-500">{avgPrice2}</div>
-                </td>
-                {/* Diff */}
-                <td className="px-2 py-1 text-right">
-                  {diff ? diff.toFixed(2) : '-'}
-                </td>
-              </>
-            ) : (
-              <td className="px-2 py-1 text-right">
-                <div>{sales1.toFixed(2)}</div>
-                <div className="text-xs text-gray-500">{avgPrice1}</div>
+          {compareMode ? (
+            <>
+              <td className="px-2 py-5 text-right text-purple-600 font-bold text-lg">
+                <div className="flex gap-2 justify-end">
+                  ${totalSales1.toFixed(2)}<span>/</span><span>{qty1}</span>
+                </div>
+                <div>${avgPrice1}</div>
               </td>
-            )}
-
-            {/* Refund Rate */}
-            <td className="px-2 py-1 text-right">
-              {formatRefundRate(item.refundRate)}
+              <td className="px-2 py-5 text-right text-blue-600 font-bold text-lg">
+                <div className="flex gap-2 justify-end">
+                  ${totalSales2.toFixed(2)}<span>/</span><span>{qty2}</span>
+                </div>
+                <div>${avgPrice2}</div>
+              </td>
+            </>
+          ) : (
+            <td className="px-2 py-5 text-right text-purple-600 font-bold text-lg">
+              <div className="flex gap-2 justify-end">
+                ${totalSales1.toFixed(2)}<span>/</span><span>{qty1}</span>
+              </div>
+              <div>${avgPrice1}</div>
             </td>
-          </tr>
-        );
-      })}
-    </tbody>
-  );
+          )}
+
+          {/* Refund Rate */}
+          <td className="px-2 py-5 text-right">
+            {formatRefundRate(item.refundRate)}
+          </td>
+        </tr>
+      );
+    })}
+  </tbody>
+);
+
 
   const handlePageChange = useCallback((newPage: number) => {
     dispatch(setCurrentPage(newPage));
@@ -240,11 +236,16 @@ const SalesTable: React.FC<UserData> = (props) => {
 
   return (
     <div className="bg-white p-4 rounded shadow">
-      {skuData.length === 0 && !loading ? (
+      {loading ? (
+        <div className="flex justify-center py-4 relative">
+          <InlineLoading size={32} />
+        </div>
+      ) : skuData.length === 0 ? (
         <p className="text-gray-500">No data available.</p>
       ) : (
-        <>
-          <table className="w-full text-sm border-collapse">
+        <div className="overflow-x-auto">
+
+          <table className="w-full text-sm border-collapse min-w-2xl">
             {thead}
             {tbody}
           </table>
@@ -265,19 +266,15 @@ const SalesTable: React.FC<UserData> = (props) => {
               Next
             </button>
           </div>
-        </>
-      )}
-
-      {loading && (
-        <div className="flex justify-center py-4 relative">
-          <InlineLoading size={32} />
         </div>
       )}
+
       {isError && (
         <div className="text-red-500 text-center">Error loading table data. Please try again.</div>
       )}
     </div>
+
   );
 };
 
-export default SalesTable;
+export default React.memo(SalesTable);

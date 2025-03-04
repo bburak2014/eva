@@ -26,3 +26,32 @@ export const getDayName = (dateStr?: string | null): string => {
     return sales.toFixed(2);
   };
   
+  //Maps an array of items to a format suitable for a stacked chart, applying highlight colors for items whose dates match the first or second entry in selectedDates.
+
+  export const buildStackedData = (
+    items: any[],
+    valueKey: string,
+    defaultColor: string,
+    highlightColors: [string, string],
+    selectedDates: string[]
+  ) => 
+    items.map((item: any) => {
+      const indexInSelected = selectedDates.indexOf(item.date);
+      let color = defaultColor;
+      if (indexInSelected === 0) {
+        color = highlightColors[0];
+      } else if (indexInSelected === 1) {
+        color = highlightColors[1];
+      }
+      return {
+        y: item[valueKey] || 0,
+        color,
+        category: item.date,
+      };
+    });
+  
+      /** Refund rate format */
+  export const formatRefundRate = (rate?: number) => {
+    if (rate === undefined || rate === null) return '-';
+    return `${(rate * 100).toFixed(2)}%`;
+  };
