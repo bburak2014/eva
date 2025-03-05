@@ -2,9 +2,10 @@
 import { useLogoutMutation } from '@/features/auth/api/authApi';
 import { toastManager } from '@/shared/utils/toastManager';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '@/features/auth/slice/authSlice';
+import { RootState } from '@/app/store';
 
 // Function to get the initials from a full name (e.g., "Jane Doe" -> "JD")
 function getInitials(name: string) {
@@ -18,6 +19,7 @@ const ProfileMenu: React.FC<{ userName: string }> = ({ userName }) => {
     const initials = getInitials(userName);
     const [logoutMutation] = useLogoutMutation();
     const dispatch = useDispatch()
+ 
     const toggleProfileMenu = () => {
         setMenuOpen((prev) => !prev);
     };
@@ -60,6 +62,7 @@ const ProfileMenu: React.FC<{ userName: string }> = ({ userName }) => {
 const Header: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggleMenu = () => setIsOpen((prev) => !prev);
+    const user = useSelector((state: RootState) => state.dashboard.user);
 
     // Define the navigation links for the menu
     const navItems = [
@@ -69,8 +72,7 @@ const Header: React.FC = () => {
         { name: 'Contact', path: '/contact' },
     ];
 
-    // Example user name
-    const userName = 'Jane Doe';
+    const userName = `${user?.firstName} ${user?.lastName}`;
 
     return (
         <header className="relative">
