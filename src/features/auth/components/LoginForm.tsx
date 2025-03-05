@@ -1,28 +1,17 @@
+// src/features/auth/components/LoginForm.tsx
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
-import * as Yup from 'yup';
 import { useLoginMutation } from '@/features/auth/api/authApi';
 import { toastManager } from '@/shared/utils/toastManager';
 import InlineLoading from '@/shared/components/common/loading/InlineLoading';
 import { useNavigate } from 'react-router-dom';
-
-
-interface LoginValues {
-  email: string;
-  password: string;
-}
+import localStorageManager from '@/shared/utils/localStorageManager';
+import { LoginValues } from '@/features/auth/types/authTypes';
+import { loginFormSchema } from '@/shared/utils/scheme';
 
 const LoginForm: React.FC = () => {
   const [login] = useLoginMutation();
   const navigate = useNavigate();
-
-  // Yup validasyon şeması
-  const validationSchema = Yup.object({
-    email: Yup.string()
-      .email('Invalid email')
-      .required('Email required'),
-    password: Yup.string().required('Password required'),
-  });
 
   const initialValues: LoginValues = {
     email: 'homework@eva.guru',
@@ -38,6 +27,7 @@ const LoginForm: React.FC = () => {
       if (result.ApiStatus && result.ApiStatusCode === 200) {
 
         toastManager.showToast('Login successful!', 'success', 3000);
+        localStorageManager.set('email', values.email);
         navigate('/dashboard');
 
       } else {
@@ -101,7 +91,7 @@ const LoginForm: React.FC = () => {
           </div>
           <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema}
+            validationSchema={loginFormSchema}
             onSubmit={handleSubmit}
           >
             {({ isSubmitting }) => (

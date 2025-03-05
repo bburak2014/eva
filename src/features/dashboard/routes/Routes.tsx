@@ -1,7 +1,8 @@
+// src/features/dashboard/routes/Routes.tsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import ProtectedRoute from '../../../shared/components/ProtectedRoute';
-import DashboardPage from '../pages/DashboardPage';
+import ProtectedRoute from '@/shared/components/ProtectedRoute';
+import DashboardPage from '@/features/dashboard/pages/DashboardPage';
 
 
 const DashboardRoutes: React.FC = () => (

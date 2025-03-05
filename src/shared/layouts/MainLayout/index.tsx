@@ -1,9 +1,6 @@
 // src/layouts/MainLayout.tsx
-import React, { ReactNode } from 'react';
-
-interface MainLayoutProps {
-    children: ReactNode;
-}
+import React from 'react';
+import { MainLayoutProps } from '@/shared/types/commonTypes';
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     return (

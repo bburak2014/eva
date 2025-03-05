@@ -1,10 +1,6 @@
 // src/components/LoadingSpinner.tsx
 import React from 'react';
-
-interface LoadingSpinnerProps {
-    fullScreen?: boolean;
-    className?: string;
-}
+import { LoadingSpinnerProps } from '@/shared/types/commonTypes';
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     fullScreen = true,

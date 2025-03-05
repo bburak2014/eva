@@ -1,3 +1,4 @@
+// main.tsx
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -9,7 +10,6 @@ import LoadingSpinner from '@/shared/components/common/loading/Loading';
 const LazyApp = React.lazy(() => import('./App'));
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
     <BrowserRouter>
       <Provider store={store}>
         <ToastProvider>
@@ -19,5 +19,4 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </ToastProvider>
       </Provider>
     </BrowserRouter>
-  </React.StrictMode>
 );
