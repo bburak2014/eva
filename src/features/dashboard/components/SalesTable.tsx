@@ -177,7 +177,7 @@ const SalesTable: React.FC<UserData> = (props) => {
   const startIndex = (currentPage - 1) * 10;
   const endIndex = startIndex + 10;
   const pageItems = skuData.slice(startIndex, endIndex);
-console.log(pageItems)
+
   const tbody = (
   <tbody>
     {pageItems.map((item, idx) => {

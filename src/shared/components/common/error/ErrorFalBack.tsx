@@ -1,16 +1,15 @@
 // ErrorFalBackComponent.tsx
 import React from 'react';
-import { ErrorFalBackProps } from '@/shared/types/commonTypes';
-
-const ErrorFalBackComponent: React.FC<ErrorFalBackProps> = ({ error, resetErrorBoundary }) => {
+ 
+const ErrorFalBackComponent: React.FC<any> = () => {
     return (
-        <div role="alert" className="p-4 bg-red-200 text-red-800 rounded">
-            <p>Bir hata oluştu:</p>
-            <pre>{error.message}</pre>
+        <div className="flex flex-col items-center justify-center h-screen">
+            <p className="text-red-500 text-2xl">Error: An error occurred.</p>
             <button
-                onClick={resetErrorBoundary}
-                className="mt-2 px-4 py-2 bg-red-500 text-white rounded">
-                Tekrar dene
+                onClick={() => window.location.reload()}
+                className="mt-4 px-4 py-2 border border-solid border-purple-500 text-purple-500 rounded cursor-pointer hover:bg-purple-500 hover:text-white"
+            >
+                Retry
             </button>
         </div>
     );
