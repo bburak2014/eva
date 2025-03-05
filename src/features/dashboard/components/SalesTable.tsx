@@ -249,11 +249,11 @@ const SalesTable: React.FC<UserData> = (props) => {
             {thead}
             {tbody}
           </table>
-          <div className="flex justify-end items-center mt-2 space-x-2">
+          <div className="flex justify-end items-center mt-2 space-x-2 gap-2">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              className="px-3 py-1 bg-blue-600 text-white  rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -261,7 +261,7 @@ const SalesTable: React.FC<UserData> = (props) => {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage >= Math.ceil(skuData.length / 10) && !hasMore}
-              className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              className="px-3 py-1 bg-blue-600 text-white rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
