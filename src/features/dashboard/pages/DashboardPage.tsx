@@ -8,7 +8,7 @@ import { useGetUserInformationMutation } from '@/features/auth/api/authApi';
 import LoadingSpinner from '@/shared/components/common/loading/Loading';
 import localStorageManager from '@/shared/utils/localStorageManager';
 import { setUser } from '@/features/dashboard/slice/dashboardSlice';
-import ErrorFalBackComponent from '@/shared/components/common/error/ErrorFalBack';
+import ErrorFallback from '@/shared/components/common/error/ErrorFallback';
 import MainLayout from '@/shared/layouts/MainLayout';
 
 const DashboardPage: React.FC = () => {
@@ -43,7 +43,7 @@ const DashboardPage: React.FC = () => {
 
   if (error) {
     return (
-      <ErrorFalBackComponent />
+      <ErrorFallback />
     );
   }
 

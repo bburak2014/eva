@@ -1,7 +1,7 @@
-// ErrorFalBackComponent.tsx
+// ErrorFallback.tsx
 import React from 'react';
  
-const ErrorFalBackComponent: React.FC<any> = () => {
+const ErrorFallback: React.FC<any> = () => {
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <p className="text-red-500 text-2xl">Error: An error occurred.</p>
@@ -15,4 +15,4 @@ const ErrorFalBackComponent: React.FC<any> = () => {
     );
 };
 
-export default ErrorFalBackComponent;
+export default ErrorFallback;

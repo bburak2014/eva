@@ -3,7 +3,7 @@ import React, { Suspense } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import NotFound from '@/shared/components/common/error/NotFound';
 import { ErrorBoundary } from 'react-error-boundary';
-import ErrorFalBackComponent from '@/shared/components/common/error/ErrorFalBack';
+import ErrorFallback from '@/shared/components/common/error/ErrorFallback';
 import LoadingSpinner from '@/shared/components/common/loading/Loading';
 
 type ModuleRoute = {
@@ -29,7 +29,7 @@ const AppRoutes: React.FC = () => {
 
   return (
     <ErrorBoundary
-      FallbackComponent={ErrorFalBackComponent}
+      FallbackComponent={ErrorFallback}
       onReset={() => { console.log('ErrorBoundary reset triggered') }}>
       <Suspense fallback={<LoadingSpinner fullScreen />}>
         <Routes>
