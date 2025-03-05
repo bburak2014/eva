@@ -55,7 +55,7 @@ Bu projenin ne yaptığı ve kimin için olduğu hakkında kısa bir açıklama
 Projede API çağrıları için VITE_API_URL gibi ortam değişkenleri kullanılmaktadır. Proje kök dizininde bir .env dosyası oluşturun ve aşağıdaki örneğe göre düzenleyin:
 
 **env:**
-VITE_API_URL=https://iapitest.eva.guru
+VITE_API_URL=https://iapitest.eva.guru/
 
 3. **Projeyi Çalıştırın:**
    ```bash
