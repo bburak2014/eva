@@ -1,15 +1,16 @@
 // src/features/dashboard/slice/dashboardSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { toastManager } from '@/shared/utils/toastManager';
-import { DashboardState } from '@/features/dashboard/types/dashboardTypes';
+import { DashboardState ,User} from '@/features/dashboard/types/dashboardTypes';
 
 
 const initialState: DashboardState = {
     selectedDay: 30,
     selectedDates: [],
-    currentPage: 1
+    currentPage: 1,
+    user: null
 };
-
+ 
 const dashboardSlice = createSlice({
     name: 'dashboard',
     initialState,
@@ -40,7 +41,10 @@ const dashboardSlice = createSlice({
         resetDashboardState(state) {
             state.selectedDates = [];
             state.currentPage = 1;
-        }
+        },
+        setUser(state, action: PayloadAction<User>) {
+            state.user = action.payload;
+          },
     }
 });
 
@@ -48,6 +52,7 @@ export const {
     setSelectedDay,
     toggleSelectedDate,
     setCurrentPage,
-    resetDashboardState
+    resetDashboardState,
+    setUser
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

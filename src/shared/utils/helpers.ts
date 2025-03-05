@@ -55,3 +55,11 @@ export const getDayName = (dateStr?: string | null): string => {
     if (rate === undefined || rate === null) return '-';
     return `${(rate * 100).toFixed(2)}%`;
   };
+
+  // Formats a number with a maximum of two decimal places, returning an empty string for null, undefined, or invalid numbers.
+  export const formatNumberWithMaxTwoDecimals = (value: number | null | undefined): string => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return '';
+    }
+    return parseFloat(value.toFixed(2)).toString();
+  };

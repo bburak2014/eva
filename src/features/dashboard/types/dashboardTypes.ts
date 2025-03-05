@@ -135,11 +135,23 @@ export interface UserData {
       point: { y: number };
     }>;
   }
-
+  export interface UserStore {
+    storeId: string;
+    marketplaceName: string;
+   
+  }
+  
+  export interface User {
+    firstName?: string;
+    lastName?: string;
+    email: string;
+}
   //slice
   export interface DashboardState {
     selectedDay: number;
     selectedDates: string[];
     currentPage: number;
+    user: User | null; 
+
 }
  
