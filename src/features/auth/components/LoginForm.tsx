@@ -110,7 +110,7 @@ const LoginForm: React.FC = () => {
                     placeholder="Enter your e-mail address"
                     className="w-full px-4 py-3 border rounded-lg bg-slate-100 focus:outline-none focus:border-purple-500 transition"
                     autoComplete="email"
-                    aria-label="Email Address"
+                    aria-label="E-mail Address"
                   />
                   <ErrorMessage
                     name="email"

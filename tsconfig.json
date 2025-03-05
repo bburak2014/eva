@@ -1,21 +1,17 @@
 {
   "files": [],
   "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ],
-  "types": [
-    "node",
-    "vite/client"
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "types": ["node", "jest", "@testing-library/jest-dom", "vite/client"],
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "moduleResolution": "node"
   }
 }
