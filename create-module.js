@@ -1,103 +1,144 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-// __filename ve __dirname tanımları (ESM'de otomatik gelmediğinden)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Yardımcı: String'in ilk harfini büyük yapar
+// İlk harfi büyük yapma fonksiyonu
 function capitalize(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 }
 
-// Komut satırından modül adını alıyoruz.
-// Örnek kullanım: npm run create:module -- sales
 const moduleName = process.argv[2];
+const isProtected = process.argv[3] === '--protected';
 
 if (!moduleName) {
-  console.error("Usage: npm run create:module -- <module-name>");
+  console.error("Usage: npm run create:module -- <module-name> [--protected]");
   process.exit(1);
 }
 
 const capitalizedModuleName = capitalize(moduleName);
-
-// Modülün temel yolu: src/features/<moduleName>
 const moduleBasePath = path.join(process.cwd(), 'src', 'features', moduleName);
 
-// Oluşturulacak klasörler
-const folders = ['api', 'components', 'model', 'pages', 'routes'];
+// Yardımcı fonksiyonlar
+function createFolder(folderPath) {
+  try {
+    fs.mkdirSync(folderPath, { recursive: true });
+    console.log(`Created folder: ${folderPath}`);
+  } catch (error) {
+    console.error(`Error creating folder ${folderPath}:`, error);
+  }
+}
 
-// Her bir klasörü oluştur ve ilgili klasörlere default dosya ekle
-folders.forEach(folder => {
-  const folderPath = path.join(moduleBasePath, folder);
-  fs.mkdirSync(folderPath, { recursive: true });
-  console.log(`Folder created: ${folderPath}`);
+function createFile(folderPath, fileName, content) {
+  const filePath = path.join(folderPath, fileName);
+  try {
+    fs.writeFileSync(filePath, content);
+    console.log(`Created file: ${filePath}`);
+  } catch (error) {
+    console.error(`Error creating file ${filePath}:`, error);
+  }
+}
 
-  // "api" klasörü: default API dosyası
-  if (folder === 'api') {
-    const fileName = `${capitalizedModuleName}Api.ts`;
-    const filePath = path.join(folderPath, fileName);
+console.log(`Creating module '${moduleName}' in src/features/...`);
+console.log(isProtected ? 'Protected route enabled.' : 'Normal route.');
+
+// Her klasöre ait dosya bilgilerini içeren nesne
+const folderFileGenerators = {
+  api: () => {
+    const fileName = `${moduleName}Api.ts`;
     const content = `import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-export const ${capitalizedModuleName}Api = createApi({
+export const ${moduleName}Api = createApi({
   reducerPath: '${moduleName}Api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://your-api-base-url.com' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_API_URL }),
   endpoints: (builder) => ({
     // Define endpoints here
   }),
 });
 
-export const { /* hooks */ } = ${capitalizedModuleName}Api;
+export const { /* hooks */ } = ${moduleName}Api;
 `;
-    fs.writeFileSync(filePath, content);
-    console.log(`Default API file created: ${filePath}`);
-  }
+    return { fileName, content };
+  },
+  routes: () => {
+    const fileName = `Routes.tsx`;
+    let content;
+    if (isProtected) {
+      content = `import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import ProtectedRoute from '../../../shared/components/ProtectedRoute';
+import ${capitalizedModuleName}Page from '../pages/${capitalizedModuleName}Page';
 
-  // "routes" klasörü: default Routes dosyası
-  else if (folder === 'routes') {
-    const fileName = `${capitalizedModuleName}Routes.tsx`;
-    const filePath = path.join(folderPath, fileName);
-    const content = `import React from 'react';
+const ${capitalizedModuleName}Routes: React.FC = () => (
+  <Routes>
+    <Route element={<ProtectedRoute />}>
+      <Route path="/${moduleName}" element={<${capitalizedModuleName}Page />} />
+    </Route>
+  </Routes>
+);
+
+export const basePath = "/${moduleName}";
+export default ${capitalizedModuleName}Routes;
+`;
+    } else {
+      content = `import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ${capitalizedModuleName}Page from '../pages/${capitalizedModuleName}Page';
 
-const ${capitalizedModuleName}Routes: React.FC = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<${capitalizedModuleName}Page />} />
-    </Routes>
-  );
-};
+const ${capitalizedModuleName}Routes: React.FC = () => (
+  <Routes>
+    <Route path="/${moduleName}" element={<${capitalizedModuleName}Page />} />
+  </Routes>
+);
 
+export const basePath = "/${moduleName}";
 export default ${capitalizedModuleName}Routes;
 `;
-    fs.writeFileSync(filePath, content);
-    console.log(`Default Routes file created: ${filePath}`);
-  }
-
-  // "pages" klasörü: default Page dosyası
-  else if (folder === 'pages') {
+    }
+    return { fileName, content };
+  },
+  pages: () => {
     const fileName = `${capitalizedModuleName}Page.tsx`;
-    const filePath = path.join(folderPath, fileName);
     const content = `import React from 'react';
 
-const ${capitalizedModuleName}Page: React.FC = () => {
-  return (
-    <div>
-      <h1>${capitalizedModuleName} Page</h1>
-      <p>This is the ${moduleName} page.</p>
-    </div>
-  );
-};
+const ${capitalizedModuleName}Page: React.FC = () => (
+  <div>
+    <h1>${capitalizedModuleName} Page</h1>
+  </div>
+);
 
 export default ${capitalizedModuleName}Page;
 `;
-    fs.writeFileSync(filePath, content);
-    console.log(`Default Page file created: ${filePath}`);
-  }
+    return { fileName, content };
+  },
+  components: () => {
+    const fileName = `${capitalizedModuleName}Component.tsx`;
+    const content = `import React from 'react';
+
+const ${capitalizedModuleName}Component: React.FC = () => (
+  <div>
+    <p>Default component for ${moduleName} module.</p>
+  </div>
+);
+
+export default ${capitalizedModuleName}Component;
+`;
+    return { fileName, content };
+  },
+  slice: () => {
+    const fileName = `${moduleName}Slice.ts`;
+    const content = `// Add state logic for ${moduleName} if needed.
+`;
+    return { fileName, content };
+  },
+};
+
+const folders = Object.keys(folderFileGenerators);
+
+folders.forEach(folder => {
+  const folderPath = path.join(moduleBasePath, folder);
+  createFolder(folderPath);
+  const { fileName, content } = folderFileGenerators[folder]();
+  createFile(folderPath, fileName, content);
 });
 
-console.log(`Module "${moduleName}" created successfully with default files!`);
+console.log(`Module "${moduleName}" created successfully!`);
