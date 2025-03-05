@@ -7,7 +7,7 @@ import { useGetDailySalesOverviewQuery } from '@/features/dashboard/api/dashboar
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { UserData, MyTooltipContext } from '@/features/dashboard/types/dashboardTypes';
-import { buildStackedData } from '@/shared/utils/helpers';
+import { buildStackedData, formatNumberWithMaxTwoDecimals } from '@/shared/utils/helpers';
 
 
 
@@ -115,23 +115,23 @@ const SalesChart: React.FC<UserData> = (props) => {
               <div class="font-bold mb-1">${this.x}</div>
               <div class="flex justify-between">
                 <span>Total Sales:</span>
-                <span class="font-semibold">$${totalSales}</span>
+                <span class="font-semibold">$${formatNumberWithMaxTwoDecimals(totalSales)}</span>
               </div>
               <div class="flex justify-between">
                 <span>Shipping:</span>
-                <span class="font-semibold">$${shipping}</span>
+                <span class="font-semibold">$${formatNumberWithMaxTwoDecimals(shipping)}</span>
               </div>
               <div class="flex justify-between">
                 <span>Profit:</span>
-                <span class="font-semibold">$${profit}</span>
+                <span class="font-semibold">$${formatNumberWithMaxTwoDecimals(profit)}</span>
               </div>
               <div class="flex justify-between">
                 <span>FBA Sales:</span>
-                <span class="font-semibold">$${fba}</span>
+                <span class="font-semibold">$${formatNumberWithMaxTwoDecimals(fba)}</span>
               </div>
               <div class="flex justify-between">
                 <span>FBM Sales:</span>
-                <span class="font-semibold">$${fbm}</span>
+                <span class="font-semibold">$${formatNumberWithMaxTwoDecimals(fbm)}</span>
               </div>
             </div>
           `;
