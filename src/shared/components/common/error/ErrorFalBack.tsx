@@ -1,10 +1,6 @@
 // ErrorFalBackComponent.tsx
 import React from 'react';
-
-interface ErrorFalBackProps {
-    error: Error;
-    resetErrorBoundary: () => void;
-}
+import { ErrorFalBackProps } from '@/shared/types/commonTypes';
 
 const ErrorFalBackComponent: React.FC<ErrorFalBackProps> = ({ error, resetErrorBoundary }) => {
     return (

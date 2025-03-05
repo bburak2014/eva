@@ -1,18 +1,9 @@
-// src/context/ToastContext.tsx
+// src/shared/context/ToastProvider.tsx
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
-import { toastManager, ToastData, ToastType } from '@/shared/utils/toastManager';
+import { toastManager } from '@/shared/utils/toastManager';
+import { Toast, ToastContainerProps, ToastContextProps, ToastItemProps, ToastType, ToastData } from '@/shared/types/commonTypes';
 
-interface Toast {
-  id: number;
-  message: string;
-  type: ToastType;
-  duration: number;
-}
-
-interface ToastContextProps {
-  addToast: (message: string, type?: ToastType, duration?: number) => void;
-}
 
 const ToastContext = createContext<ToastContextProps | undefined>(undefined);
 
@@ -59,10 +50,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-interface ToastContainerProps {
-  toasts: Toast[];
-  removeToast: (id: number) => void;
-}
+
 
 const ToastContainer = ({ toasts, removeToast }: ToastContainerProps) => {
   return ReactDOM.createPortal(
@@ -75,10 +63,7 @@ const ToastContainer = ({ toasts, removeToast }: ToastContainerProps) => {
   );
 };
 
-interface ToastItemProps {
-  toast: Toast;
-  onClose: () => void;
-}
+
 
 const ToastItem = ({ toast, onClose }: ToastItemProps) => {
   const [visible, setVisible] = useState(false);
@@ -92,14 +77,13 @@ const ToastItem = ({ toast, onClose }: ToastItemProps) => {
     toast.type === 'success'
       ? 'bg-green-100 text-green-800'
       : toast.type === 'error'
-      ? 'bg-red-100 text-red-800'
-      : 'bg-blue-100 text-blue-800';
+        ? 'bg-red-100 text-red-800'
+        : 'bg-blue-100 text-blue-800';
 
   return (
     <div
-      className={`max-w-xs w-full relative px-6 py-3 rounded-lg shadow-lg ${bgColor} transition-all duration-500 ease-in-out ${
-        visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
-      }`}
+      className={`max-w-xs w-full relative px-6 py-3 rounded-lg shadow-lg ${bgColor} transition-all duration-500 ease-in-out ${visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+        }`}
     >
       <div className="flex justify-between items-start">
         <span>{toast.message}</span>

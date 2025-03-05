@@ -1,3 +1,4 @@
+// src/app/routes/AppRoutes.tsx
 import React, { Suspense } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import NotFound from '@/shared/components/common/error/NotFound';

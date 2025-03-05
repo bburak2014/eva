@@ -1,11 +1,6 @@
 // src/shared/utils/toastManager.ts
 export type ToastType = 'success' | 'error' | 'info';
-
-export interface ToastData {
-  message: string;
-  type?: ToastType;
-  duration?: number;
-}
+import { ToastData } from "@/shared/types/commonTypes";
 
 type ToastListener = (toast: ToastData) => void;
 

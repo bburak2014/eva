@@ -1,11 +1,7 @@
+import { LocalStorageManagerInterface } from "@/shared/types/commonTypes";
+
 const isBrowser = typeof window !== 'undefined';
 
-interface LocalStorageManagerInterface {
-    get<T>(key: string): T | null;
-    set<T>(key: string, value: T): void;
-    remove(key: string): void;
-    clear(): void;
-}
 
 const localStorageManager: LocalStorageManagerInterface = {
     // Retrieves the value from localStorage for the given key.
